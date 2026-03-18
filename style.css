@@ -1,0 +1,177 @@
+/* ═══════════════════════════════════════════════════════════
+   Nico Channel+ Theater Mode
+   ═══════════════════════════════════════════════════════════ */
+
+/* ─── body ─────────────────────────────────────────────────── */
+body.nico-theater-on {
+  overflow: hidden !important;
+}
+
+/* ─── シアターコンテナ ──────────────────────────────────────── */
+#nico-theater-root {
+  --cw: 360px;
+
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 2147483647 !important;
+  display: flex !important;
+  flex-direction: row !important;
+  background: #000 !important;
+  overflow: hidden !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* ─── プレイヤースロット ────────────────────────────────────── */
+#nico-theater-pslot {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  height: 100% !important;
+  background: #000 !important;
+  overflow: hidden !important;
+  position: relative !important;
+  display: flex !important;
+  align-items: stretch !important;
+}
+
+#nico-theater-pslot > * {
+  flex: 1 !important;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none !important;
+  max-height: none !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+}
+
+#nico-theater-pslot video {
+  object-fit: contain !important;
+  object-position: center !important;
+  background: #000 !important;
+  display: block !important;
+}
+
+/* ─── コメントスロット ──────────────────────────────────────── */
+#nico-theater-cslot {
+  width: var(--cw) !important;
+  flex-shrink: 0 !important;
+  height: 100% !important;
+  background: #111 !important;
+  border-left: 1px solid #2a2a2a !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+  transition: width 0.2s ease !important;
+}
+
+#nico-theater-cslot > * {
+  width: 100% !important;
+  height: 100% !important;
+  max-height: none !important;
+  flex: 1 !important;
+}
+
+/* ─── コメント開閉タブボタン ────────────────────────────────── */
+#nico-theater-ctoggle {
+  position: absolute !important;
+  right: var(--cw) !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  z-index: 10 !important;
+
+  width: 24px !important;
+  height: 88px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+
+  background: rgba(25, 25, 25, 0.95) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  border-right: none !important;
+  border-radius: 8px 0 0 8px !important;
+  color: #aaa !important;
+  cursor: pointer !important;
+
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 5px !important;
+
+  box-shadow: -3px 0 10px rgba(0, 0, 0, 0.7) !important;
+  transition: background 0.15s, color 0.15s, right 0.2s ease !important;
+}
+
+#nico-theater-ctoggle:hover {
+  background: rgba(55, 55, 55, 0.98) !important;
+  color: #fff !important;
+}
+
+#nico-theater-ctoggle.closed {
+  right: 0 !important;
+  background: rgba(0, 100, 210, 0.92) !important;
+  border-color: rgba(80, 150, 255, 0.3) !important;
+  color: #fff !important;
+}
+
+.nct-arrow {
+  font-size: 11px !important;
+  line-height: 1 !important;
+  display: block !important;
+}
+
+.nct-label {
+  writing-mode: vertical-rl !important;
+  text-orientation: mixed !important;
+  font-size: 9px !important;
+  letter-spacing: 1.5px !important;
+  line-height: 1 !important;
+  display: block !important;
+  color: inherit !important;
+}
+
+/* ─── メイントグルボタン（右下固定）────────────────────────── */
+#nico-theater-btn {
+  position: fixed !important;
+  bottom: 20px !important;
+  right: 20px !important;
+  z-index: 2147483646 !important;
+
+  width: 44px !important;
+  height: 44px !important;
+  padding: 9px !important;
+  margin: 0 !important;
+
+  border-radius: 10px !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.15) !important;
+  background: rgba(15, 15, 15, 0.88) !important;
+  color: #ccc !important;
+  cursor: pointer !important;
+
+  -webkit-backdrop-filter: blur(6px) !important;
+  backdrop-filter: blur(6px) !important;
+  box-shadow: 0 2px 14px rgba(0, 0, 0, 0.55) !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: background 0.2s, border-color 0.2s !important;
+  font-size: 0 !important;
+  line-height: 0 !important;
+}
+
+#nico-theater-btn svg {
+  width: 22px !important;
+  height: 22px !important;
+  display: block !important;
+}
+
+#nico-theater-btn:hover {
+  background: rgba(55, 55, 55, 0.95) !important;
+  color: #fff !important;
+}
+
+#nico-theater-btn.active {
+  background: rgba(0, 108, 218, 0.92) !important;
+  border-color: rgba(100, 170, 255, 0.45) !important;
+  color: #fff !important;
+}
