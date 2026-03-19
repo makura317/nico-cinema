@@ -13,6 +13,7 @@
   let theaterEl     = null;
   let modifiedEls   = [];
   let controlsObserver = null;
+  let controlsEl       = null;
 
   // ─── findPlayer ────────────────────────────────────────────
 
@@ -170,30 +171,36 @@
   }
 
   // ─── forceControlsVisible ────────────────────────────────────
-
-  const CTRL_SEL =
-    '[class*="PlayerControl"],' +
-    '[class*="playerControl"],' +
-    '[class*="player-control"],' +
-    '[class*="ControlBar"],'    +
-    '[class*="controlBar"],'    +
-    '[class*="control-bar"],'   +
-    '[class*="Controls"]';
+  // クラス名に依存せず「seekbar を含む要素が opacity:0 になったら戻す」方式
 
   function forceControlsVisible(player) {
-    const controls = player.querySelector(CTRL_SEL);
-    if (!controls) return;
+    const SEEKBAR_SEL = 'input[type="range"], [role="slider"]';
 
-    const saved = controls.style.cssText;
-    const applyShow = () => {
-      controls.style.setProperty("opacity",    "1",       "important");
-      controls.style.setProperty("visibility", "visible", "important");
+    const showEl = (el) => {
+      el.style.setProperty("opacity",    "1",       "important");
+      el.style.setProperty("visibility", "visible", "important");
     };
-    applyShow();
-    modifiedEls.push({ el: controls, cssText: saved });
 
-    controlsObserver = new MutationObserver(applyShow);
-    controlsObserver.observe(controls, {
+    const checkHide = (el) => {
+      if (el === player || !player.contains(el)) return;
+      if (parseFloat(getComputedStyle(el).opacity) < 1 && el.querySelector(SEEKBAR_SEL)) {
+        if (!controlsEl) controlsEl = el;
+        showEl(el);
+      }
+    };
+
+    controlsObserver = new MutationObserver((mutations) => {
+      for (const m of mutations) {
+        if (controlsEl) {
+          if (m.target === controlsEl) showEl(controlsEl);
+        } else {
+          checkHide(m.target);
+        }
+      }
+    });
+
+    controlsObserver.observe(player, {
+      subtree: true,
       attributes: true,
       attributeFilter: ["style", "class"],
     });
@@ -273,6 +280,11 @@
 
   function exit() {
     if (controlsObserver) { controlsObserver.disconnect(); controlsObserver = null; }
+    if (controlsEl) {
+      controlsEl.style.removeProperty("opacity");
+      controlsEl.style.removeProperty("visibility");
+      controlsEl = null;
+    }
     modifiedEls.forEach(({ el, cssText }) => { el.style.cssText = cssText; });
     modifiedEls = [];
     if (commentEl && commentSaved !== null) commentEl.style.cssText = commentSaved;
