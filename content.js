@@ -14,6 +14,7 @@
   let modifiedEls   = [];
   let controlsInterval = null;
   let controlsEl       = null;
+  let controlsObs      = null;
 
   // ─── findPlayer ────────────────────────────────────────────
 
@@ -171,12 +172,84 @@
   }
 
   // ─── keepControlsVisible ─────────────────────────────────────
-  // ① seekbar を含む要素を見つけて opacity 強制
-  // ② 定期的に mousemove を dispatch してプレイヤーの hover 検知を維持
+  // 本物のインタラクティブな制御バーを特定してCSS強制 + MutationObserverで維持
 
   function keepControlsVisible(player) {
-    const tryShow = () => {
-      // mousemove dispatch でプレイヤーの hover 状態を維持
+    // 本物の制御バー（ボタン複数・pointer-events:auto・短い高さ）を探す
+    const findCtrlBar = () => {
+      const pr = player.getBoundingClientRect();
+      if (pr.width === 0) return null;
+      const btns = Array.from(player.querySelectorAll("button"));
+      if (btns.length < 2) return null;
+
+      let best = null, bestScore = 0;
+      const seen = new Set();
+      for (const btn of btns) {
+        let el = btn.parentElement;
+        while (el && el !== player) {
+          if (!seen.has(el)) {
+            seen.add(el);
+            const r = el.getBoundingClientRect();
+            const s = getComputedStyle(el);
+            if (
+              s.pointerEvents !== "none" &&
+              r.width  > pr.width  * 0.35 &&
+              r.height > 0 && r.height < pr.height * 0.45
+            ) {
+              const score = el.querySelectorAll("button").length;
+              if (score > bestScore) { bestScore = score; best = el; }
+            }
+          }
+          el = el.parentElement;
+        }
+      }
+      return best;
+    };
+
+    const applyForce = (bar) => {
+      // 制御バー自体と、非表示になっている祖先要素も強制表示
+      let el = bar;
+      while (el && el !== player) {
+        const s = getComputedStyle(el);
+        if (parseFloat(s.opacity) < 0.9 || s.visibility === "hidden") {
+          if (!modifiedEls.find(m => m.el === el)) {
+            modifiedEls.push({ el, cssText: el.style.cssText });
+          }
+          el.style.setProperty("opacity",    "1",       "important");
+          el.style.setProperty("visibility", "visible", "important");
+        }
+        el = el.parentElement;
+      }
+      // bar 自体は必ず強制
+      if (!modifiedEls.find(m => m.el === bar)) {
+        modifiedEls.push({ el: bar, cssText: bar.style.cssText });
+      }
+      bar.style.setProperty("opacity",    "1",       "important");
+      bar.style.setProperty("visibility", "visible", "important");
+      controlsEl = bar;
+      console.log("[NicoTheater] control bar forced:", bar.className.slice(0, 80));
+
+      // SDK が opacity を戻そうとしたら即座に上書き
+      if (controlsObs) controlsObs.disconnect();
+      controlsObs = new MutationObserver(() => {
+        if (bar.style.opacity !== "1")
+          bar.style.setProperty("opacity",    "1",       "important");
+        if (bar.style.visibility !== "visible")
+          bar.style.setProperty("visibility", "visible", "important");
+      });
+      controlsObs.observe(bar, { attributes: true, attributeFilter: ["style"] });
+    };
+
+    const tryFind = () => {
+      const bar = findCtrlBar();
+      if (bar) { applyForce(bar); return true; }
+      return false;
+    };
+
+    setTimeout(() => { if (!tryFind()) setTimeout(tryFind, 1500); }, 500);
+
+    // mousemove dispatch も補助的に維持（isTrusted:false だが念のため）
+    const tryMove = () => {
       const r = player.getBoundingClientRect();
       if (r.width > 0 && r.height > 0) {
         player.dispatchEvent(new MouseEvent("mousemove", {
@@ -186,9 +259,8 @@
         }));
       }
     };
-
-    controlsInterval = setInterval(tryShow, 1500);
-    setTimeout(tryShow, 400);
+    controlsInterval = setInterval(tryMove, 1500);
+    setTimeout(tryMove, 400);
   }
 
   // ─── enter / exit ────────────────────────────────────────────
@@ -265,6 +337,7 @@
 
   function exit() {
     if (controlsInterval) { clearInterval(controlsInterval); controlsInterval = null; }
+    if (controlsObs)      { controlsObs.disconnect();        controlsObs      = null; }
     modifiedEls.forEach(({ el, cssText }) => { el.style.cssText = cssText; });
     modifiedEls = [];
     if (commentEl && commentSaved !== null) commentEl.style.cssText = commentSaved;
