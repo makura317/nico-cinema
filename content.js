@@ -186,11 +186,7 @@
     const pSlot = document.createElement("div");
     pSlot.id = "nico-theater-pslot";
 
-    const cSlot = document.createElement("div");
-    cSlot.id = "nico-theater-cslot";
-    if (!commentEl) cSlot.style.display = "none";
-
-    theaterEl.append(pSlot, cSlot);
+    theaterEl.append(pSlot);
     document.body.appendChild(theaterEl);
     addToggleBtn(!!commentEl);
 
@@ -215,13 +211,17 @@
       overlayEl.style.setProperty("z-index",        "5",        "important");
     }
 
-    // ── コメント移動 ──
+    // ── コメント: DOM移動せず fixed 配置（React イベント保持）──
     if (commentEl) {
-      commentSaved = detach(commentEl, cSlot);
-      commentEl.style.setProperty("width",      "100%", "important");
-      commentEl.style.setProperty("height",     "100%", "important");
-      commentEl.style.setProperty("max-height", "none", "important");
-      commentEl.style.setProperty("overflow-y", "auto", "important");
+      commentSaved = commentEl.style.cssText;
+      commentEl.style.setProperty("position",   "fixed",          "important");
+      commentEl.style.setProperty("top",        "0",              "important");
+      commentEl.style.setProperty("right",      "0",              "important");
+      commentEl.style.setProperty("width",      `${COMMENT_W}px`, "important");
+      commentEl.style.setProperty("height",     "100%",           "important");
+      commentEl.style.setProperty("max-height", "none",           "important");
+      commentEl.style.setProperty("overflow-y", "auto",           "important");
+      commentEl.style.setProperty("z-index",    "2147483647",     "important");
     }
 
     commentVisible = true;
@@ -236,9 +236,9 @@
   function exit() {
     modifiedEls.forEach(({ el, cssText }) => { el.style.cssText = cssText; });
     modifiedEls = [];
+    if (commentEl && commentSaved !== null) commentEl.style.cssText = commentSaved;
     reattach(playerEl,  playerSaved);
     reattach(overlayEl, overlaySaved);
-    reattach(commentEl, commentSaved);
 
     theaterEl?.remove();
     theaterEl = playerEl = commentEl = overlayEl = null;
@@ -285,8 +285,14 @@
   function toggleComment() {
     if (!theaterEl) return;
     commentVisible = !commentVisible;
-    const cSlot = theaterEl.querySelector("#nico-theater-cslot");
-    if (cSlot) cSlot.style.display = commentVisible ? "" : "none";
+    if (commentEl) {
+      if (commentVisible) {
+        commentEl.style.removeProperty("display");
+        commentEl.style.setProperty("right", "0", "important");
+      } else {
+        commentEl.style.setProperty("display", "none", "important");
+      }
+    }
     theaterEl.style.setProperty("--cw", commentVisible ? `${COMMENT_W}px` : "0px");
     updateCommentToggleBtn();
     setTimeout(() => window.dispatchEvent(new Event("resize")), 50);
