@@ -220,7 +220,10 @@
       commentSaved = commentEl.style.cssText;
       commentEl.style.setProperty("position",   "fixed",          "important");
       commentEl.style.setProperty("top",        "0",              "important");
+      commentEl.style.setProperty("bottom",     "0",              "important");
       commentEl.style.setProperty("right",      "0",              "important");
+      commentEl.style.setProperty("left",       "auto",           "important");
+      commentEl.style.setProperty("transform",  "none",           "important");
       commentEl.style.setProperty("width",      `${COMMENT_W}px`, "important");
       commentEl.style.setProperty("height",     "100%",           "important");
       commentEl.style.setProperty("max-height", "none",           "important");
