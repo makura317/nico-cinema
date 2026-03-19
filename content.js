@@ -12,6 +12,7 @@
   let overlayEl     = null, overlaySaved     = null;
   let theaterEl     = null;
   let modifiedEls   = [];
+  let controlsObserver = null;
 
   // ─── findPlayer ────────────────────────────────────────────
 
@@ -168,6 +169,36 @@
     }
   }
 
+  // ─── forceControlsVisible ────────────────────────────────────
+
+  const CTRL_SEL =
+    '[class*="PlayerControl"],' +
+    '[class*="playerControl"],' +
+    '[class*="player-control"],' +
+    '[class*="ControlBar"],'    +
+    '[class*="controlBar"],'    +
+    '[class*="control-bar"],'   +
+    '[class*="Controls"]';
+
+  function forceControlsVisible(player) {
+    const controls = player.querySelector(CTRL_SEL);
+    if (!controls) return;
+
+    const saved = controls.style.cssText;
+    const applyShow = () => {
+      controls.style.setProperty("opacity",    "1",       "important");
+      controls.style.setProperty("visibility", "visible", "important");
+    };
+    applyShow();
+    modifiedEls.push({ el: controls, cssText: saved });
+
+    controlsObserver = new MutationObserver(applyShow);
+    controlsObserver.observe(controls, {
+      attributes: true,
+      attributeFilter: ["style", "class"],
+    });
+  }
+
   // ─── enter / exit ────────────────────────────────────────────
 
   function enter() {
@@ -203,6 +234,7 @@
     playerEl.style.setProperty("margin",     "0",    "important");
 
     applyVideoFill(playerEl);
+    forceControlsVisible(playerEl);
 
     // ── 弾幕オーバーレイ移動（外側にあった場合）──
     if (overlayEl) {
@@ -240,6 +272,7 @@
   }
 
   function exit() {
+    if (controlsObserver) { controlsObserver.disconnect(); controlsObserver = null; }
     modifiedEls.forEach(({ el, cssText }) => { el.style.cssText = cssText; });
     modifiedEls = [];
     if (commentEl && commentSaved !== null) commentEl.style.cssText = commentSaved;
