@@ -57,7 +57,6 @@ body.nico-theater-on {
   flex-shrink: 0 !important;
   height: 100% !important;
   background: #111 !important;
-  border-left: 1px solid #2a2a2a !important;
   overflow: hidden !important;
   display: flex !important;
   flex-direction: column !important;
@@ -75,8 +74,8 @@ body.nico-theater-on {
 #nico-theater-ctoggle {
   position: absolute !important;
   right: var(--cw) !important;
-  top: 50% !important;
-  transform: translateY(-50%) !important;
+  top: 20px !important;
+  transform: none !important;
   z-index: 10 !important;
 
   width: 24px !important;
@@ -98,12 +97,14 @@ body.nico-theater-on {
   gap: 5px !important;
 
   box-shadow: -3px 0 10px rgba(0, 0, 0, 0.7) !important;
-  transition: background 0.15s, color 0.15s, right 0.2s ease !important;
+  opacity: 0.08 !important;
+  transition: background 0.15s, color 0.15s, right 0.2s ease, opacity 0.2s !important;
 }
 
 #nico-theater-ctoggle:hover {
   background: rgba(55, 55, 55, 0.98) !important;
   color: #fff !important;
+  opacity: 0.55 !important;
 }
 
 #nico-theater-ctoggle.closed {
@@ -111,6 +112,11 @@ body.nico-theater-on {
   background: rgba(0, 100, 210, 0.92) !important;
   border-color: rgba(80, 150, 255, 0.3) !important;
   color: #fff !important;
+  opacity: 0.12 !important;
+}
+
+#nico-theater-ctoggle.closed:hover {
+  opacity: 0.6 !important;
 }
 
 .nct-arrow {
