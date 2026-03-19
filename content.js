@@ -200,40 +200,79 @@
     }
   }
 
+  // ─── findCtrlBar ─────────────────────────────────────────────
+  // インタラクティブなコントロールバーを返す
+
+  function findCtrlBar(player) {
+    const pr = player.getBoundingClientRect();
+    if (pr.width === 0) return null;
+    const btns = Array.from(player.querySelectorAll("button"));
+    if (btns.length < 2) return null;
+
+    let best = null, bestScore = 0;
+    const seen = new Set();
+    for (const btn of btns) {
+      let el = btn.parentElement;
+      while (el && el !== player) {
+        if (!seen.has(el)) {
+          seen.add(el);
+          const r = el.getBoundingClientRect();
+          const s = getComputedStyle(el);
+          if (
+            s.pointerEvents !== "none" &&
+            r.width  > pr.width  * 0.35 &&
+            r.height > 0 && r.height < pr.height * 0.45
+          ) {
+            const score = el.querySelectorAll("button").length;
+            if (score > bestScore) { bestScore = score; best = el; }
+          }
+        }
+        el = el.parentElement;
+      }
+    }
+    return best;
+  }
+
+  // ─── placeMainBtnInCtrlBar ───────────────────────────────────
+  // メインボタンをコントロールバー内に配置（既に配置済みなら何もしない）
+
+  function placeMainBtnInCtrlBar(bar) {
+    const btn = document.getElementById("nico-cinema-btn");
+    if (!btn || btn.parentNode === bar) return;
+    bar.appendChild(btn);
+    btn.style.setProperty("position",        "relative",              "important");
+    btn.style.setProperty("top",             "auto",                  "important");
+    btn.style.setProperty("bottom",          "auto",                  "important");
+    btn.style.setProperty("left",            "auto",                  "important");
+    btn.style.setProperty("right",           "auto",                  "important");
+    btn.style.setProperty("align-self",      "stretch",               "important");
+    btn.style.setProperty("width",           "auto",                  "important");
+    btn.style.setProperty("height",          "auto",                  "important");
+    btn.style.setProperty("padding",         "0 8px",                 "important");
+    btn.style.setProperty("margin",          "0",                     "important");
+    btn.style.setProperty("border-radius",   "0",                     "important");
+    btn.style.setProperty("border",          "none",                  "important");
+    btn.style.setProperty("background",      "transparent",           "important");
+    btn.style.setProperty("color",           "rgba(255,255,255,0.9)", "important");
+    btn.style.setProperty("cursor",          "pointer",               "important");
+    btn.style.setProperty("opacity",         "1",                     "important");
+    btn.style.setProperty("display",         "inline-flex",           "important");
+    btn.style.setProperty("align-items",     "center",                "important");
+    btn.style.setProperty("justify-content", "center",                "important");
+    btn.style.setProperty("flex-shrink",     "0",                     "important");
+    btn.style.setProperty("box-shadow",      "none",                  "important");
+    const svg = btn.querySelector("svg");
+    if (svg) {
+      svg.style.setProperty("width",  "20px", "important");
+      svg.style.setProperty("height", "20px", "important");
+    }
+    console.log("[NicoCinema] main btn placed in ctrl bar");
+  }
+
   // ─── keepControlsVisible ─────────────────────────────────────
   // 本物のインタラクティブ制御バーをCSS強制 + MutationObserver で維持
 
   function keepControlsVisible(player) {
-    const findCtrlBar = () => {
-      const pr = player.getBoundingClientRect();
-      if (pr.width === 0) return null;
-      const btns = Array.from(player.querySelectorAll("button"));
-      if (btns.length < 2) return null;
-
-      let best = null, bestScore = 0;
-      const seen = new Set();
-      for (const btn of btns) {
-        let el = btn.parentElement;
-        while (el && el !== player) {
-          if (!seen.has(el)) {
-            seen.add(el);
-            const r = el.getBoundingClientRect();
-            const s = getComputedStyle(el);
-            if (
-              s.pointerEvents !== "none" &&
-              r.width  > pr.width  * 0.35 &&
-              r.height > 0 && r.height < pr.height * 0.45
-            ) {
-              const score = el.querySelectorAll("button").length;
-              if (score > bestScore) { bestScore = score; best = el; }
-            }
-          }
-          el = el.parentElement;
-        }
-      }
-      return best;
-    };
-
     const applyForce = (bar) => {
       // 制御バーから playerEl まで遡り、非表示の祖先も強制表示
       let el = bar;
@@ -256,29 +295,7 @@
       controlsEl = bar;
       console.log("[NicoCinema] control bar forced:", bar.className.slice(0, 80));
 
-      // メインボタンをコントロールバー内に移動
-      const mainBtn = document.getElementById("nico-cinema-btn");
-      if (mainBtn) {
-        mainBtn._savedParent  = mainBtn.parentNode;
-        mainBtn._savedCssText = mainBtn.style.cssText;
-        bar.appendChild(mainBtn);
-        mainBtn.style.cssText = "";
-        mainBtn.style.setProperty("position",      "relative",           "important");
-        mainBtn.style.setProperty("width",         "32px",               "important");
-        mainBtn.style.setProperty("height",        "32px",               "important");
-        mainBtn.style.setProperty("padding",       "5px",                "important");
-        mainBtn.style.setProperty("margin",        "0 4px",              "important");
-        mainBtn.style.setProperty("border-radius", "6px",                "important");
-        mainBtn.style.setProperty("border",        "none",               "important");
-        mainBtn.style.setProperty("background",    "transparent",        "important");
-        mainBtn.style.setProperty("color",         "rgba(255,255,255,0.85)", "important");
-        mainBtn.style.setProperty("cursor",        "pointer",            "important");
-        mainBtn.style.setProperty("opacity",       "1",                  "important");
-        mainBtn.style.setProperty("display",       "inline-flex",        "important");
-        mainBtn.style.setProperty("align-items",   "center",             "important");
-        mainBtn.style.setProperty("justify-content","center",            "important");
-        mainBtn.style.setProperty("flex-shrink",   "0",                  "important");
-      }
+      placeMainBtnInCtrlBar(bar);
 
       if (controlsObs) controlsObs.disconnect();
       controlsObs = new MutationObserver(() => {
@@ -291,7 +308,7 @@
     };
 
     const tryFind = () => {
-      const bar = findCtrlBar();
+      const bar = findCtrlBar(player);
       if (bar) { applyForce(bar); return true; }
       return false;
     };
@@ -398,15 +415,6 @@
     playerEl  = commentEl  = overlayEl  = null;
     playerSaved = commentSaved = overlaySaved = null;
 
-    // メインボタンをコントロールバーから body に戻す
-    const mainBtn = document.getElementById("nico-cinema-btn");
-    if (mainBtn && mainBtn._savedParent) {
-      mainBtn.style.cssText = mainBtn._savedCssText ?? "";
-      mainBtn._savedParent.appendChild(mainBtn);
-      delete mainBtn._savedParent;
-      delete mainBtn._savedCssText;
-    }
-
     document.getElementById("nico-cinema-ctoggle")?.remove();
     document.body.classList.remove("nico-cinema-on");
     updateMainBtn(false);
@@ -475,6 +483,17 @@
       </svg>`;
     btn.addEventListener("click", toggleCinema);
     document.body.appendChild(btn);
+
+    // OFF状態でもコントロールバーに配置（非同期リトライ）
+    const tryPlace = () => {
+      const player = findPlayer();
+      if (!player) return false;
+      const bar = findCtrlBar(player);
+      if (!bar) return false;
+      placeMainBtnInCtrlBar(bar);
+      return true;
+    };
+    setTimeout(() => { if (!tryPlace()) setTimeout(() => { if (!tryPlace()) setTimeout(tryPlace, 2000); }, 1000); }, 800);
   }
 
   function updateMainBtn(on) {
