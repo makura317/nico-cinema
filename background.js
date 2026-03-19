@@ -10,8 +10,12 @@ function isTargetUrl(url) {
 
 function updateBadge(tabId, url) {
   const match = isTargetUrl(url);
-  chrome.action.setBadgeText({ text: match ? "ON" : "", tabId });
-  if (match) chrome.action.setBadgeBackgroundColor({ color: BADGE_COLOR, tabId });
+  if (match) {
+    chrome.action.setBadgeText({ text: "OFF", tabId });
+    chrome.action.setBadgeBackgroundColor({ color: "#555", tabId });
+  } else {
+    chrome.action.setBadgeText({ text: "", tabId });
+  }
 }
 
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
