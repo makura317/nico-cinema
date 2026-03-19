@@ -134,11 +134,14 @@
   }
 
   // ─── applyVideoFill ──────────────────────────────────────────
+  // video → playerEl を遡り、ラッパー要素を absolute+inset:0 で引き伸ばす
+  // ボタンを含む要素（コントロール付き）は position 変更せず padding のみクリア
 
   function applyVideoFill(player) {
     const video = player.querySelector("video");
     if (!video) return;
 
+    // video 自体を強制拡張
     const savedVideo = video.style.cssText;
     video.style.setProperty("width",           "100%",    "important");
     video.style.setProperty("height",          "100%",    "important");
@@ -147,20 +150,21 @@
     video.style.setProperty("background",      "#000",    "important");
     modifiedEls.push({ el: video, cssText: savedVideo });
 
+    // 中間ラッパーを遡って拡張
     let el = video.parentElement;
     while (el && el !== player) {
-      const visibleKids = Array.from(el.children).filter(c => {
-        const s = getComputedStyle(c);
-        return s.display !== "none" && s.visibility !== "hidden"
-               && (c.offsetHeight > 0 || c.offsetWidth > 0);
-      });
-      if (visibleKids.length <= 1) {
-        modifiedEls.push({ el, cssText: el.style.cssText });
-        el.style.setProperty("width",      "100%", "important");
-        el.style.setProperty("height",     "100%", "important");
-        el.style.setProperty("max-width",  "none", "important");
-        el.style.setProperty("max-height", "none", "important");
+      modifiedEls.push({ el, cssText: el.style.cssText });
+      // ボタンを含まない純粋なラッパー → absolute + inset:0 で playerEl 全体に貼り付け
+      if (el.querySelectorAll("button").length === 0) {
+        el.style.setProperty("position",   "absolute", "important");
+        el.style.setProperty("inset",      "0",        "important");
       }
+      // 共通: padding の aspect-ratio ハックをクリア、サイズを 100% に
+      el.style.setProperty("padding",    "0",    "important");
+      el.style.setProperty("width",      "100%", "important");
+      el.style.setProperty("height",     "100%", "important");
+      el.style.setProperty("max-width",  "none", "important");
+      el.style.setProperty("max-height", "none", "important");
       el = el.parentElement;
     }
   }
@@ -313,6 +317,7 @@
     playerEl.style.setProperty("max-width",  "none",           "important");
     playerEl.style.setProperty("max-height", "none",           "important");
     playerEl.style.setProperty("margin",     "0",              "important");
+    playerEl.style.setProperty("padding",    "0",              "important");
     playerEl.style.setProperty("background", "#000",           "important");
 
     applyVideoFill(playerEl);
