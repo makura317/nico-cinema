@@ -7,11 +7,10 @@
   let active         = false;
   let commentVisible = true;
 
-  let playerEl      = null, playerSaved      = null;
-  let commentEl     = null, commentSaved     = null;
-  let overlayEl     = null, overlaySaved     = null;
-  let theaterEl     = null;
-  let modifiedEls   = [];
+  let playerEl   = null, playerSaved   = null;
+  let commentEl  = null, commentSaved  = null;
+  let overlayEl  = null, overlaySaved  = null;
+  let modifiedEls    = [];
   let controlsInterval = null;
   let controlsEl       = null;
   let controlsObs      = null;
@@ -135,13 +134,11 @@
   }
 
   // ─── applyVideoFill ──────────────────────────────────────────
-  // video から playerEl まで遡り、純粋なラッパー要素だけ 100% に拡張
 
   function applyVideoFill(player) {
     const video = player.querySelector("video");
     if (!video) return;
 
-    // video 自体を強制拡張
     const savedVideo = video.style.cssText;
     video.style.setProperty("width",           "100%",    "important");
     video.style.setProperty("height",          "100%",    "important");
@@ -150,16 +147,13 @@
     video.style.setProperty("background",      "#000",    "important");
     modifiedEls.push({ el: video, cssText: savedVideo });
 
-    // 中間要素をチェックしながら遡る
     let el = video.parentElement;
     while (el && el !== player) {
-      // 表示中の子要素の数をカウント
       const visibleKids = Array.from(el.children).filter(c => {
         const s = getComputedStyle(c);
         return s.display !== "none" && s.visibility !== "hidden"
                && (c.offsetHeight > 0 || c.offsetWidth > 0);
       });
-      // 子が1つ以下（純粋なラッパー）なら安全に拡張
       if (visibleKids.length <= 1) {
         modifiedEls.push({ el, cssText: el.style.cssText });
         el.style.setProperty("width",      "100%", "important");
@@ -171,11 +165,41 @@
     }
   }
 
+  // ─── fixAncestorStacking ─────────────────────────────────────
+  // playerEl の祖先でスタッキングコンテキストを作っている要素の z-index を引き上げ
+  // ※ transform を持つ祖先は position:fixed の基準になるため transform を除去
+
+  function fixAncestorStacking(el) {
+    let cur = el.parentElement;
+    while (cur && cur !== document.documentElement) {
+      const s = getComputedStyle(cur);
+      const hasTransform = s.transform && s.transform !== "none";
+      const createsContext =
+        (s.position !== "static" && s.zIndex !== "auto") ||
+        hasTransform ||
+        (s.filter && s.filter !== "none") ||
+        s.isolation === "isolate" ||
+        parseFloat(s.opacity) < 1;
+      if (createsContext) {
+        if (!modifiedEls.find(m => m.el === cur)) {
+          modifiedEls.push({ el: cur, cssText: cur.style.cssText });
+        }
+        // transform があると position:fixed が viewport 基準にならないので除去
+        if (hasTransform) {
+          cur.style.setProperty("transform", "none", "important");
+        }
+        cur.style.setProperty("z-index",  "99998",   "important");
+        cur.style.setProperty("position", "relative", "important");
+        console.log("[NicoTheater] stacking fixed:", cur.id || cur.className.slice(0, 40));
+      }
+      cur = cur.parentElement;
+    }
+  }
+
   // ─── keepControlsVisible ─────────────────────────────────────
-  // 本物のインタラクティブな制御バーを特定してCSS強制 + MutationObserverで維持
+  // 本物のインタラクティブ制御バーをCSS強制 + MutationObserver で維持
 
   function keepControlsVisible(player) {
-    // 本物の制御バー（ボタン複数・pointer-events:auto・短い高さ）を探す
     const findCtrlBar = () => {
       const pr = player.getBoundingClientRect();
       if (pr.width === 0) return null;
@@ -207,7 +231,7 @@
     };
 
     const applyForce = (bar) => {
-      // 制御バー自体と、非表示になっている祖先要素も強制表示
+      // 制御バーから playerEl まで遡り、非表示の祖先も強制表示
       let el = bar;
       while (el && el !== player) {
         const s = getComputedStyle(el);
@@ -220,7 +244,6 @@
         }
         el = el.parentElement;
       }
-      // bar 自体は必ず強制
       if (!modifiedEls.find(m => m.el === bar)) {
         modifiedEls.push({ el: bar, cssText: bar.style.cssText });
       }
@@ -229,7 +252,6 @@
       controlsEl = bar;
       console.log("[NicoTheater] control bar forced:", bar.className.slice(0, 80));
 
-      // SDK が opacity を戻そうとしたら即座に上書き
       if (controlsObs) controlsObs.disconnect();
       controlsObs = new MutationObserver(() => {
         if (bar.style.opacity !== "1")
@@ -248,7 +270,7 @@
 
     setTimeout(() => { if (!tryFind()) setTimeout(tryFind, 1500); }, 500);
 
-    // mousemove dispatch も補助的に維持（isTrusted:false だが念のため）
+    // mousemove も補助的に
     const tryMove = () => {
       const r = player.getBoundingClientRect();
       if (r.width > 0 && r.height > 0) {
@@ -275,55 +297,53 @@
     overlayEl = findFloatingOverlay(playerEl);
     commentEl = findComment(playerEl);
 
-    theaterEl = document.createElement("div");
-    theaterEl.id = "nico-theater-root";
+    // ── スタッキングコンテキスト修正（DOM移動なし・position:fixed 用） ──
+    fixAncestorStacking(playerEl);
 
-    const pSlot = document.createElement("div");
-    pSlot.id = "nico-theater-pslot";
-
-    const cSlot = document.createElement("div");
-    cSlot.id = "nico-theater-cslot";
-    if (!commentEl) cSlot.style.display = "none";
-
-    theaterEl.append(pSlot, cSlot);
-    document.body.appendChild(theaterEl);
-    addToggleBtn(!!commentEl);
-
-    // ── プレイヤー移動 ──
-    playerSaved = detach(playerEl, pSlot);
-    playerEl.style.setProperty("width",      "100%", "important");
-    playerEl.style.setProperty("height",     "100%", "important");
-    playerEl.style.setProperty("max-width",  "none", "important");
-    playerEl.style.setProperty("max-height", "none", "important");
-    playerEl.style.setProperty("margin",     "0",    "important");
+    // ── プレイヤー: DOM移動なし、position:fixed で全画面化 ──
+    playerSaved = playerEl.style.cssText;
+    playerEl.style.setProperty("position",   "fixed",          "important");
+    playerEl.style.setProperty("top",        "0",              "important");
+    playerEl.style.setProperty("left",       "0",              "important");
+    playerEl.style.setProperty("right",      `${COMMENT_W}px`, "important");
+    playerEl.style.setProperty("bottom",     "0",              "important");
+    playerEl.style.setProperty("z-index",    "99999",          "important");
+    playerEl.style.setProperty("width",      "auto",           "important");
+    playerEl.style.setProperty("height",     "auto",           "important");
+    playerEl.style.setProperty("max-width",  "none",           "important");
+    playerEl.style.setProperty("max-height", "none",           "important");
+    playerEl.style.setProperty("margin",     "0",              "important");
+    playerEl.style.setProperty("background", "#000",           "important");
 
     applyVideoFill(playerEl);
     keepControlsVisible(playerEl);
 
-    // ── 弾幕オーバーレイ移動（外側にあった場合）──
+    // ── 弾幕オーバーレイ ──
     if (overlayEl) {
-      overlaySaved = detach(overlayEl, pSlot);
-      overlayEl.style.setProperty("position",       "absolute", "important");
-      overlayEl.style.setProperty("inset",          "0",        "important");
-      overlayEl.style.setProperty("width",          "100%",     "important");
-      overlayEl.style.setProperty("height",         "100%",     "important");
-      overlayEl.style.setProperty("pointer-events", "none",     "important");
-      overlayEl.style.setProperty("z-index",        "5",        "important");
+      overlaySaved = overlayEl.style.cssText;
+      overlayEl.style.setProperty("position",       "fixed",          "important");
+      overlayEl.style.setProperty("top",            "0",              "important");
+      overlayEl.style.setProperty("left",           "0",              "important");
+      overlayEl.style.setProperty("right",          `${COMMENT_W}px`, "important");
+      overlayEl.style.setProperty("bottom",         "0",              "important");
+      overlayEl.style.setProperty("z-index",        "100000",         "important");
+      overlayEl.style.setProperty("pointer-events", "none",           "important");
     }
 
-    // ── コメント: cSlotはスペーサーとして残し、commentEl はDOMそのままfixed配置 ──
+    // ── コメント ──
+    addToggleBtn(!!commentEl);
     if (commentEl) {
       commentSaved = commentEl.style.cssText;
       commentEl.style.setProperty("position",   "fixed",          "important");
       commentEl.style.setProperty("top",        "0",              "important");
-      commentEl.style.setProperty("bottom",     "0",              "important");
       commentEl.style.setProperty("right",      "0",              "important");
+      commentEl.style.setProperty("bottom",     "0",              "important");
       commentEl.style.setProperty("left",       "auto",           "important");
-      commentEl.style.setProperty("transform",  "none",           "important");
       commentEl.style.setProperty("width",      `${COMMENT_W}px`, "important");
       commentEl.style.setProperty("height",     "100%",           "important");
       commentEl.style.setProperty("max-height", "none",           "important");
-      commentEl.style.setProperty("z-index",    "9999",           "important");
+      commentEl.style.setProperty("transform",  "none",           "important");
+      commentEl.style.setProperty("z-index",    "99999",          "important");
     }
 
     commentVisible = true;
@@ -338,14 +358,15 @@
   function exit() {
     if (controlsInterval) { clearInterval(controlsInterval); controlsInterval = null; }
     if (controlsObs)      { controlsObs.disconnect();        controlsObs      = null; }
+
     modifiedEls.forEach(({ el, cssText }) => { el.style.cssText = cssText; });
     modifiedEls = [];
-    if (commentEl && commentSaved !== null) commentEl.style.cssText = commentSaved;
-    reattach(playerEl,  playerSaved);
-    reattach(overlayEl, overlaySaved);
 
-    theaterEl?.remove();
-    theaterEl = playerEl = commentEl = overlayEl = null;
+    if (playerEl)                           playerEl.style.cssText  = playerSaved  ?? "";
+    if (commentEl  && commentSaved  != null) commentEl.style.cssText  = commentSaved;
+    if (overlayEl  && overlaySaved  != null) overlayEl.style.cssText  = overlaySaved;
+
+    playerEl  = commentEl  = overlayEl  = null;
     playerSaved = commentSaved = overlaySaved = null;
 
     document.getElementById("nico-theater-ctoggle")?.remove();
@@ -353,26 +374,6 @@
     updateMainBtn(false);
 
     setTimeout(() => window.dispatchEvent(new Event("resize")), 200);
-  }
-
-  // ─── DOM ユーティリティ ──────────────────────────────────────
-
-  function detach(el, slot) {
-    const saved = { parent: el.parentNode, next: el.nextSibling, cssText: el.style.cssText };
-    slot.appendChild(el);
-    return saved;
-  }
-
-  function reattach(el, saved) {
-    if (!el || !saved) return;
-    el.style.cssText = saved.cssText;
-    try {
-      if (saved.next && saved.parent.contains(saved.next)) {
-        saved.parent.insertBefore(el, saved.next);
-      } else {
-        saved.parent.appendChild(el);
-      }
-    } catch (_) {}
   }
 
   // ─── コメント開閉 ────────────────────────────────────────────
@@ -388,12 +389,11 @@
   }
 
   function toggleComment() {
-    if (!theaterEl) return;
+    if (!active) return;
     commentVisible = !commentVisible;
-    // cSlot（スペーサー）の表示切替
-    const cSlot = theaterEl.querySelector("#nico-theater-cslot");
-    if (cSlot) cSlot.style.display = commentVisible ? "" : "none";
-    // commentEl 本体の表示切替
+    const rightVal = commentVisible ? `${COMMENT_W}px` : "0";
+    if (playerEl)  playerEl.style.setProperty("right",  rightVal, "important");
+    if (overlayEl) overlayEl.style.setProperty("right", rightVal, "important");
     if (commentEl) {
       if (commentVisible) {
         commentEl.style.removeProperty("display");
@@ -401,9 +401,8 @@
         commentEl.style.setProperty("display", "none", "important");
       }
     }
-    theaterEl.style.setProperty("--cw", commentVisible ? `${COMMENT_W}px` : "0px");
     const ctoggle = document.getElementById("nico-theater-ctoggle");
-    if (ctoggle) ctoggle.style.right = commentVisible ? `${COMMENT_W}px` : "0px";
+    if (ctoggle) ctoggle.style.right = rightVal;
     updateCommentToggleBtn();
     setTimeout(() => window.dispatchEvent(new Event("resize")), 50);
   }

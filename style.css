@@ -7,79 +7,12 @@ body.nico-theater-on {
   overflow: hidden !important;
 }
 
-/* ─── シアターコンテナ ──────────────────────────────────────── */
-#nico-theater-root {
-  --cw: 360px;
-
-  position: fixed !important;
-  inset: 0 !important;
-  z-index: 9998 !important;
-  display: flex !important;
-  flex-direction: row !important;
-  gap: 0 !important;
-  background: transparent !important;
-  overflow: hidden !important;
-  margin: 0 !important;
-  padding: 0 !important;
-}
-
-/* ─── プレイヤースロット ────────────────────────────────────── */
-#nico-theater-pslot {
-  flex: 1 1 auto !important;
-  min-width: 0 !important;
-  height: 100% !important;
-  background: #000 !important;
-  overflow: hidden !important;
-  position: relative !important;
-  display: flex !important;
-  align-items: stretch !important;
-}
-
-#nico-theater-pslot > * {
-  flex: 1 !important;
-  width: 100% !important;
-  height: 100% !important;
-  max-width: none !important;
-  max-height: none !important;
-  min-width: 0 !important;
-  min-height: 0 !important;
-  margin: 0 !important;
-}
-
-#nico-theater-pslot video {
-  object-fit: contain !important;
-  object-position: center !important;
-  background: #000 !important;
-  display: block !important;
-}
-
-/* ─── コメントスロット（スペーサーのみ・背景透過） ──────────── */
-#nico-theater-cslot {
-  width: var(--cw) !important;
-  flex-shrink: 0 !important;
-  height: 100% !important;
-  background: transparent !important;
-  overflow: hidden !important;
-  display: flex !important;
-  flex-direction: column !important;
-  transition: width 0.2s ease !important;
-  pointer-events: none !important;
-}
-
-#nico-theater-cslot > * {
-  width: 100% !important;
-  height: 100% !important;
-  max-height: none !important;
-  flex: 1 !important;
-  margin: 0 !important;
-}
-
 /* ─── コメント開閉タブボタン ────────────────────────────────── */
 #nico-theater-ctoggle {
   position: fixed !important;
   top: 20px !important;
   transform: none !important;
-  z-index: 10000 !important;
+  z-index: 110000 !important;
 
   width: 24px !important;
   height: 88px !important;
@@ -141,12 +74,12 @@ body.nico-theater-on {
   color: inherit !important;
 }
 
-/* ─── メイントグルボタン（右下固定）────────────────────────── */
+/* ─── メイントグルボタン（左下固定）────────────────────────── */
 #nico-theater-btn {
   position: fixed !important;
   bottom: 20px !important;
   left: 20px !important;
-  z-index: 10001 !important;
+  z-index: 110001 !important;
 
   width: 44px !important;
   height: 44px !important;
