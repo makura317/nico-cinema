@@ -1,8 +1,15 @@
 const BADGE_COLOR = "#006cda";
-const TARGET_HOST  = "nicochannel.jp";
+
+function isTargetUrl(url) {
+  if (!url) return false;
+  try {
+    const u = new URL(url);
+    return u.hostname === "nicochannel.jp" && /\/(video|live)\//.test(u.pathname);
+  } catch (_) { return false; }
+}
 
 function updateBadge(tabId, url) {
-  const match = url && url.includes(TARGET_HOST);
+  const match = isTargetUrl(url);
   chrome.action.setBadgeText({ text: match ? "ON" : "", tabId });
   if (match) chrome.action.setBadgeBackgroundColor({ color: BADGE_COLOR, tabId });
 }

@@ -16,6 +16,7 @@ body.nico-theater-on {
   z-index: 2147483647 !important;
   display: flex !important;
   flex-direction: row !important;
+  gap: 0 !important;
   background: #000 !important;
   overflow: hidden !important;
   margin: 0 !important;
@@ -42,6 +43,7 @@ body.nico-theater-on {
   max-height: none !important;
   min-width: 0 !important;
   min-height: 0 !important;
+  margin: 0 !important;
 }
 
 #nico-theater-pslot video {
@@ -68,6 +70,7 @@ body.nico-theater-on {
   height: 100% !important;
   max-height: none !important;
   flex: 1 !important;
+  margin: 0 !important;
 }
 
 /* ─── コメント開閉タブボタン ────────────────────────────────── */
@@ -123,6 +126,9 @@ body.nico-theater-on {
   font-size: 11px !important;
   line-height: 1 !important;
   display: block !important;
+  color: rgba(255, 255, 255, 0.85) !important;
+  text-shadow: 0 0 6px rgba(255,255,255,0.6) !important;
+  opacity: 1 !important;
 }
 
 .nct-label {
