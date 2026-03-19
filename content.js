@@ -235,26 +235,32 @@
     document.body.appendChild(theaterEl);
     addToggleBtn(!!commentEl);
 
-    // ── プレイヤー移動 ──
-    playerSaved = detach(playerEl, pSlot);
-    playerEl.style.setProperty("width",      "100%", "important");
-    playerEl.style.setProperty("height",     "100%", "important");
-    playerEl.style.setProperty("max-width",  "none", "important");
-    playerEl.style.setProperty("max-height", "none", "important");
-    playerEl.style.setProperty("margin",     "0",    "important");
+    // ── プレイヤー: DOM移動せず position:fixed で左側に固定 ──
+    const playerW = commentEl ? `calc(100vw - ${COMMENT_W}px)` : "100vw";
+    playerSaved = playerEl.style.cssText;
+    playerEl.style.setProperty("position",   "fixed",  "important");
+    playerEl.style.setProperty("top",        "0",      "important");
+    playerEl.style.setProperty("left",       "0",      "important");
+    playerEl.style.setProperty("width",      playerW,  "important");
+    playerEl.style.setProperty("height",     "100vh",  "important");
+    playerEl.style.setProperty("z-index",    "9995",   "important");
+    playerEl.style.setProperty("margin",     "0",      "important");
+    playerEl.style.setProperty("max-width",  "none",   "important");
+    playerEl.style.setProperty("max-height", "none",   "important");
 
     applyVideoFill(playerEl);
     keepControlsVisible(playerEl);
 
-    // ── 弾幕オーバーレイ移動（外側にあった場合）──
+    // ── 弾幕オーバーレイ（外側にあった場合）: 同様に fixed ──
     if (overlayEl) {
-      overlaySaved = detach(overlayEl, pSlot);
-      overlayEl.style.setProperty("position",       "absolute", "important");
-      overlayEl.style.setProperty("inset",          "0",        "important");
-      overlayEl.style.setProperty("width",          "100%",     "important");
-      overlayEl.style.setProperty("height",         "100%",     "important");
-      overlayEl.style.setProperty("pointer-events", "none",     "important");
-      overlayEl.style.setProperty("z-index",        "5",        "important");
+      overlaySaved = overlayEl.style.cssText;
+      overlayEl.style.setProperty("position",       "fixed",  "important");
+      overlayEl.style.setProperty("top",            "0",      "important");
+      overlayEl.style.setProperty("left",           "0",      "important");
+      overlayEl.style.setProperty("width",          playerW,  "important");
+      overlayEl.style.setProperty("height",         "100vh",  "important");
+      overlayEl.style.setProperty("pointer-events", "none",   "important");
+      overlayEl.style.setProperty("z-index",        "9996",   "important");
     }
 
     // ── コメント: cSlotはスペーサーとして残し、commentEl はDOMそのままfixed配置 ──
@@ -291,8 +297,8 @@
     modifiedEls.forEach(({ el, cssText }) => { el.style.cssText = cssText; });
     modifiedEls = [];
     if (commentEl && commentSaved !== null) commentEl.style.cssText = commentSaved;
-    reattach(playerEl,  playerSaved);
-    reattach(overlayEl, overlaySaved);
+    if (playerEl  && playerSaved  !== null) playerEl.style.cssText  = playerSaved;
+    if (overlayEl && overlaySaved !== null) overlayEl.style.cssText = overlaySaved;
 
     theaterEl?.remove();
     theaterEl = playerEl = commentEl = overlayEl = null;
@@ -352,6 +358,9 @@
       }
     }
     theaterEl.style.setProperty("--cw", commentVisible ? `${COMMENT_W}px` : "0px");
+    const pw = commentVisible ? `calc(100vw - ${COMMENT_W}px)` : "100vw";
+    if (playerEl)  playerEl.style.setProperty("width",  pw, "important");
+    if (overlayEl) overlayEl.style.setProperty("width", pw, "important");
     const ctoggle = document.getElementById("nico-theater-ctoggle");
     if (ctoggle) ctoggle.style.right = commentVisible ? `${COMMENT_W}px` : "0px";
     updateCommentToggleBtn();
