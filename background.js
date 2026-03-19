@@ -14,6 +14,11 @@ function updateBadge(tabId, url) {
   if (match) chrome.action.setBadgeBackgroundColor({ color: BADGE_COLOR, tabId });
 }
 
+// 起動時に既存タブのバッジを初期化
+chrome.tabs.query({}, (tabs) => {
+  for (const tab of tabs) updateBadge(tab.id, tab.url);
+});
+
 chrome.tabs.onActivated.addListener(({ tabId }) => {
   chrome.tabs.get(tabId, (tab) => {
     if (chrome.runtime.lastError) return;
