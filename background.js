@@ -1,5 +1,3 @@
-const BADGE_COLOR = "#006cda";
-
 function isTargetUrl(url) {
   if (!url) return false;
   try {

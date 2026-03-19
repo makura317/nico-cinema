@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <!-- 背景 -->
+  <rect width="128" height="128" rx="24" fill="#111111"/>
+
+  <!-- モニター本体 -->
+  <rect x="14" y="22" width="100" height="66" rx="8"
+        fill="none" stroke="#ffffff" stroke-width="6"/>
+
+  <!-- スタンド縦棒 -->
+  <line x1="64" y1="88" x2="64" y2="106"
+        stroke="#ffffff" stroke-width="6" stroke-linecap="round"/>
+
+  <!-- スタンド横棒 -->
+  <line x1="40" y1="106" x2="88" y2="106"
+        stroke="#ffffff" stroke-width="6" stroke-linecap="round"/>
+</svg>

@@ -1,11 +1,17 @@
 {
   "manifest_version": 3,
   "name": "Nico Channel+ Cinema Mode",
-  "version": "1.0.27",
-  "description": "ニコニコチャンネルプラスの生放送、動画をシネマモードで視聴",
+  "version": "1.0",
+  "description": "ニコニコチャンネルプラスの生放送、動画をシネマモードで視聴\n右上のタブでコメント欄の表示/非表示切り替え可能",
   "permissions": ["tabs"],
+  "icons": {
+    "16": "icon.png",
+    "48": "icon.png",
+    "128": "icon.png"
+  },
   "action": {
-    "default_title": "シネマモード切替 (T)"
+    "default_title": "シネマモード切替 (T)",
+    "default_icon": "icon.png"
   },
   "background": {
     "service_worker": "background.js"

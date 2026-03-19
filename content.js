@@ -12,7 +12,6 @@
   let overlayEl  = null, overlaySaved  = null;
   let modifiedEls    = [];
   let controlsInterval = null;
-  let controlsEl       = null;
   let controlsObs      = null;
 
   // ─── findPlayer ────────────────────────────────────────────
@@ -41,7 +40,7 @@
           '[class*="controls"]'
         );
         if (hasControls) {
-          console.log("[NicoCinema] player (controls found):", el.className.slice(0, 80));
+  
           return el;
         }
       }
@@ -52,7 +51,7 @@
     for (let i = 0; i < 12 && el && el !== document.body; i++) {
       const r = el.getBoundingClientRect();
       if (r.width >= window.innerWidth * 0.35 && r.height >= 120) {
-        console.log("[NicoCinema] player (size):", el.className.slice(0, 80));
+
         return el;
       }
       el = el.parentElement;
@@ -66,7 +65,7 @@
     if (player.querySelector(
       'canvas, [class*="danmaku" i], [class*="NiconicoPlayer__comment" i], [class*="comment-layer" i], [class*="commentLayer" i]'
     )) {
-      console.log("[NicoCinema] 弾幕オーバーレイはプレイヤー内に内包済み");
+
       return null;
     }
 
@@ -87,7 +86,7 @@
         sib.querySelector("canvas") ||
         /danmaku|overlay|comment.?layer|float/i.test(sib.className)
       )) {
-        console.log("[NicoCinema] 弾幕オーバーレイ発見:", sib.className.slice(0, 80));
+
         return sib;
       }
     }
@@ -113,7 +112,7 @@
           if (el === player || player.contains(el) || el.contains(player)) continue;
           const r = el.getBoundingClientRect();
           if (r.height > 100 && r.width > 60) {
-            console.log("[NicoCinema] comment (selector):", el.className.slice(0, 60));
+
             return el;
           }
         }
@@ -129,7 +128,7 @@
       const area = r.width * r.height;
       if (area > bestArea && r.height > 100) { bestArea = area; best = el; }
     }
-    if (best) console.log("[NicoCinema] comment (fallback):", best.className.slice(0, 60));
+
     return best;
   }
 
@@ -194,7 +193,7 @@
         }
         cur.style.setProperty("z-index",  "99998",   "important");
         cur.style.setProperty("position", "relative", "important");
-        console.log("[NicoCinema] stacking fixed:", cur.id || cur.className.slice(0, 40));
+
       }
       cur = cur.parentElement;
     }
@@ -270,7 +269,7 @@
     btn.removeAttribute("title");
     btn.addEventListener("mouseenter", showCinemaTooltip);
     btn.addEventListener("mouseleave", hideCinemaTooltip);
-    console.log("[NicoCinema] main btn placed in ctrl bar");
+
   }
 
   // ─── ツールチップ ────────────────────────────────────────────
@@ -318,7 +317,6 @@
       bar.style.setProperty("opacity",    "1",       "important");
       bar.style.setProperty("visibility", "visible", "important");
       controlsEl = bar;
-      console.log("[NicoCinema] control bar forced:", bar.className.slice(0, 80));
 
       placeMainBtnInCtrlBar(bar);
 
