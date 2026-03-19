@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Nico Channel+ Theater Mode",
-  "version": "1.0.13",
+  "version": "1.0.14",
   "description": "ニコニコチャンネルプラスの生放送を16:9シアターモードで視聴",
   "permissions": ["tabs"],
   "action": {

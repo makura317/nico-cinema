@@ -12,7 +12,7 @@
   let overlayEl     = null, overlaySaved     = null;
   let theaterEl     = null;
   let modifiedEls   = [];
-  let controlsObserver = null;
+  let controlsInterval = null;
   let controlsEl       = null;
 
   // ─── findPlayer ────────────────────────────────────────────
@@ -170,40 +170,43 @@
     }
   }
 
-  // ─── forceControlsVisible ────────────────────────────────────
-  // クラス名に依存せず「seekbar を含む要素が opacity:0 になったら戻す」方式
+  // ─── keepControlsVisible ─────────────────────────────────────
+  // ① seekbar を含む要素を見つけて opacity 強制
+  // ② 定期的に mousemove を dispatch してプレイヤーの hover 検知を維持
 
-  function forceControlsVisible(player) {
-    const SEEKBAR_SEL = 'input[type="range"], [role="slider"]';
+  function keepControlsVisible(player) {
+    const SEEKBAR_SEL = 'input[type="range"], [role="slider"], [role="progressbar"]';
 
-    const showEl = (el) => {
-      el.style.setProperty("opacity",    "1",       "important");
-      el.style.setProperty("visibility", "visible", "important");
-    };
-
-    const checkHide = (el) => {
-      if (el === player || !player.contains(el)) return;
-      if (parseFloat(getComputedStyle(el).opacity) < 1 && el.querySelector(SEEKBAR_SEL)) {
-        if (!controlsEl) controlsEl = el;
-        showEl(el);
-      }
-    };
-
-    controlsObserver = new MutationObserver((mutations) => {
-      for (const m of mutations) {
-        if (controlsEl) {
-          if (m.target === controlsEl) showEl(controlsEl);
-        } else {
-          checkHide(m.target);
+    const tryShow = () => {
+      // ① CSS 強制
+      if (!controlsEl) {
+        const seekbar = player.querySelector(SEEKBAR_SEL);
+        if (seekbar) {
+          let el = seekbar.parentElement;
+          while (el && el !== player) {
+            if (parseFloat(getComputedStyle(el).opacity) < 1) { controlsEl = el; break; }
+            el = el.parentElement;
+          }
         }
       }
-    });
+      if (controlsEl) {
+        controlsEl.style.setProperty("opacity",    "1",       "important");
+        controlsEl.style.setProperty("visibility", "visible", "important");
+      }
 
-    controlsObserver.observe(player, {
-      subtree: true,
-      attributes: true,
-      attributeFilter: ["style", "class"],
-    });
+      // ② mousemove dispatch（プレイヤー下部、コントロールバー付近）
+      const r = player.getBoundingClientRect();
+      if (r.width > 0 && r.height > 0) {
+        player.dispatchEvent(new MouseEvent("mousemove", {
+          bubbles: true, cancelable: true, view: window,
+          clientX: r.left + r.width  / 2,
+          clientY: r.top  + r.height - 40,
+        }));
+      }
+    };
+
+    controlsInterval = setInterval(tryShow, 1500);
+    setTimeout(tryShow, 400);
   }
 
   // ─── enter / exit ────────────────────────────────────────────
@@ -241,7 +244,7 @@
     playerEl.style.setProperty("margin",     "0",    "important");
 
     applyVideoFill(playerEl);
-    forceControlsVisible(playerEl);
+    keepControlsVisible(playerEl);
 
     // ── 弾幕オーバーレイ移動（外側にあった場合）──
     if (overlayEl) {
@@ -279,7 +282,7 @@
   }
 
   function exit() {
-    if (controlsObserver) { controlsObserver.disconnect(); controlsObserver = null; }
+    if (controlsInterval) { clearInterval(controlsInterval); controlsInterval = null; }
     if (controlsEl) {
       controlsEl.style.removeProperty("opacity");
       controlsEl.style.removeProperty("visibility");
