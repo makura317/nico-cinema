@@ -97,7 +97,7 @@ body.nico-cinema-on {
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  opacity: 0.08 !important;
+  opacity: 0.75 !important;
   transition: background 0.2s, border-color 0.2s, opacity 0.2s !important;
   font-size: 0 !important;
   line-height: 0 !important;

@@ -256,6 +256,30 @@
       controlsEl = bar;
       console.log("[NicoCinema] control bar forced:", bar.className.slice(0, 80));
 
+      // メインボタンをコントロールバー内に移動
+      const mainBtn = document.getElementById("nico-cinema-btn");
+      if (mainBtn) {
+        mainBtn._savedParent  = mainBtn.parentNode;
+        mainBtn._savedCssText = mainBtn.style.cssText;
+        bar.appendChild(mainBtn);
+        mainBtn.style.cssText = "";
+        mainBtn.style.setProperty("position",      "relative",           "important");
+        mainBtn.style.setProperty("width",         "32px",               "important");
+        mainBtn.style.setProperty("height",        "32px",               "important");
+        mainBtn.style.setProperty("padding",       "5px",                "important");
+        mainBtn.style.setProperty("margin",        "0 4px",              "important");
+        mainBtn.style.setProperty("border-radius", "6px",                "important");
+        mainBtn.style.setProperty("border",        "none",               "important");
+        mainBtn.style.setProperty("background",    "transparent",        "important");
+        mainBtn.style.setProperty("color",         "rgba(255,255,255,0.85)", "important");
+        mainBtn.style.setProperty("cursor",        "pointer",            "important");
+        mainBtn.style.setProperty("opacity",       "1",                  "important");
+        mainBtn.style.setProperty("display",       "inline-flex",        "important");
+        mainBtn.style.setProperty("align-items",   "center",             "important");
+        mainBtn.style.setProperty("justify-content","center",            "important");
+        mainBtn.style.setProperty("flex-shrink",   "0",                  "important");
+      }
+
       if (controlsObs) controlsObs.disconnect();
       controlsObs = new MutationObserver(() => {
         if (bar.style.opacity !== "1")
@@ -373,6 +397,15 @@
 
     playerEl  = commentEl  = overlayEl  = null;
     playerSaved = commentSaved = overlaySaved = null;
+
+    // メインボタンをコントロールバーから body に戻す
+    const mainBtn = document.getElementById("nico-cinema-btn");
+    if (mainBtn && mainBtn._savedParent) {
+      mainBtn.style.cssText = mainBtn._savedCssText ?? "";
+      mainBtn._savedParent.appendChild(mainBtn);
+      delete mainBtn._savedParent;
+      delete mainBtn._savedCssText;
+    }
 
     document.getElementById("nico-cinema-ctoggle")?.remove();
     document.body.classList.remove("nico-cinema-on");

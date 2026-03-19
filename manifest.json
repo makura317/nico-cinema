@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Nico Channel+ Cinema Mode",
-  "version": "1.0.24",
+  "version": "1.0.25",
   "description": "ニコニコチャンネルプラスの生放送、動画をシネマモードで視聴",
   "permissions": ["tabs"],
   "action": {
