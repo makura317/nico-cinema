@@ -266,7 +266,32 @@
       svg.style.setProperty("width",  "20px", "important");
       svg.style.setProperty("height", "20px", "important");
     }
+    // ネイティブ title を除去して独自ツールチップに置き換え
+    btn.removeAttribute("title");
+    btn.addEventListener("mouseenter", showCinemaTooltip);
+    btn.addEventListener("mouseleave", hideCinemaTooltip);
     console.log("[NicoCinema] main btn placed in ctrl bar");
+  }
+
+  // ─── ツールチップ ────────────────────────────────────────────
+
+  function showCinemaTooltip(e) {
+    let tip = document.getElementById("nico-cinema-tooltip");
+    if (!tip) {
+      tip = document.createElement("div");
+      tip.id = "nico-cinema-tooltip";
+      document.body.appendChild(tip);
+    }
+    tip.textContent = active ? "シネマモード終了 (T)" : "シネマモード (T)";
+    const r = e.currentTarget.getBoundingClientRect();
+    tip.style.setProperty("left",    `${r.left + r.width / 2}px`, "important");
+    tip.style.setProperty("top",     `${r.top}px`,                "important");
+    tip.style.setProperty("display", "block",                     "important");
+  }
+
+  function hideCinemaTooltip() {
+    const tip = document.getElementById("nico-cinema-tooltip");
+    if (tip) tip.style.setProperty("display", "none", "important");
   }
 
   // ─── keepControlsVisible ─────────────────────────────────────
@@ -416,6 +441,7 @@
     playerSaved = commentSaved = overlaySaved = null;
 
     document.getElementById("nico-cinema-ctoggle")?.remove();
+    document.getElementById("nico-cinema-tooltip")?.remove();
     document.body.classList.remove("nico-cinema-on");
     updateMainBtn(false);
 
