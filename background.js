@@ -16,6 +16,7 @@ function updateBadge(tabId, url) {
 
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   if (changeInfo.url !== undefined) updateBadge(tabId, changeInfo.url);
+  else if (changeInfo.status === "complete" && tab.url) updateBadge(tabId, tab.url);
 });
 
 chrome.runtime.onMessage.addListener((msg, sender) => {
