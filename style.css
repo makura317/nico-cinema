@@ -13,7 +13,7 @@ body.nico-theater-on {
 
   position: fixed !important;
   inset: 0 !important;
-  z-index: 9990 !important;
+  z-index: 9998 !important;
   display: flex !important;
   flex-direction: row !important;
   gap: 0 !important;
