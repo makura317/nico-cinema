@@ -1,11 +1,11 @@
 {
   "manifest_version": 3,
-  "name": "Nico Channel+ Theater Mode",
-  "version": "1.0.21",
-  "description": "ニコニコチャンネルプラスの生放送を16:9シアターモードで視聴",
+  "name": "Nico Channel+ Cinema Mode",
+  "version": "1.0.22",
+  "description": "ニコニコチャンネルプラスの生放送を16:9シネマモードで視聴",
   "permissions": ["tabs"],
   "action": {
-    "default_title": "シアターモード切替 (T)"
+    "default_title": "シネマモード切替 (T)"
   },
   "background": {
     "service_worker": "background.js"

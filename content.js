@@ -41,7 +41,7 @@
           '[class*="controls"]'
         );
         if (hasControls) {
-          console.log("[NicoTheater] player (controls found):", el.className.slice(0, 80));
+          console.log("[NicoCinema] player (controls found):", el.className.slice(0, 80));
           return el;
         }
       }
@@ -52,7 +52,7 @@
     for (let i = 0; i < 12 && el && el !== document.body; i++) {
       const r = el.getBoundingClientRect();
       if (r.width >= window.innerWidth * 0.35 && r.height >= 120) {
-        console.log("[NicoTheater] player (size):", el.className.slice(0, 80));
+        console.log("[NicoCinema] player (size):", el.className.slice(0, 80));
         return el;
       }
       el = el.parentElement;
@@ -66,7 +66,7 @@
     if (player.querySelector(
       'canvas, [class*="danmaku" i], [class*="NiconicoPlayer__comment" i], [class*="comment-layer" i], [class*="commentLayer" i]'
     )) {
-      console.log("[NicoTheater] 弾幕オーバーレイはプレイヤー内に内包済み");
+      console.log("[NicoCinema] 弾幕オーバーレイはプレイヤー内に内包済み");
       return null;
     }
 
@@ -87,7 +87,7 @@
         sib.querySelector("canvas") ||
         /danmaku|overlay|comment.?layer|float/i.test(sib.className)
       )) {
-        console.log("[NicoTheater] 弾幕オーバーレイ発見:", sib.className.slice(0, 80));
+        console.log("[NicoCinema] 弾幕オーバーレイ発見:", sib.className.slice(0, 80));
         return sib;
       }
     }
@@ -113,7 +113,7 @@
           if (el === player || player.contains(el) || el.contains(player)) continue;
           const r = el.getBoundingClientRect();
           if (r.height > 100 && r.width > 60) {
-            console.log("[NicoTheater] comment (selector):", el.className.slice(0, 60));
+            console.log("[NicoCinema] comment (selector):", el.className.slice(0, 60));
             return el;
           }
         }
@@ -129,7 +129,7 @@
       const area = r.width * r.height;
       if (area > bestArea && r.height > 100) { bestArea = area; best = el; }
     }
-    if (best) console.log("[NicoTheater] comment (fallback):", best.className.slice(0, 60));
+    if (best) console.log("[NicoCinema] comment (fallback):", best.className.slice(0, 60));
     return best;
   }
 
@@ -194,7 +194,7 @@
         }
         cur.style.setProperty("z-index",  "99998",   "important");
         cur.style.setProperty("position", "relative", "important");
-        console.log("[NicoTheater] stacking fixed:", cur.id || cur.className.slice(0, 40));
+        console.log("[NicoCinema] stacking fixed:", cur.id || cur.className.slice(0, 40));
       }
       cur = cur.parentElement;
     }
@@ -254,7 +254,7 @@
       bar.style.setProperty("opacity",    "1",       "important");
       bar.style.setProperty("visibility", "visible", "important");
       controlsEl = bar;
-      console.log("[NicoTheater] control bar forced:", bar.className.slice(0, 80));
+      console.log("[NicoCinema] control bar forced:", bar.className.slice(0, 80));
 
       if (controlsObs) controlsObs.disconnect();
       controlsObs = new MutationObserver(() => {
@@ -294,7 +294,7 @@
   function enter() {
     playerEl = findPlayer();
     if (!playerEl) {
-      alert("[NicoTheater] プレイヤーが見つかりません。\n配信ページを開いてから再試行してください。");
+      alert("[NicoCinema] プレイヤーが見つかりません。\n配信ページを開いてから再試行してください。");
       return false;
     }
 
@@ -352,7 +352,7 @@
     }
 
     commentVisible = true;
-    document.body.classList.add("nico-theater-on");
+    document.body.classList.add("nico-cinema-on");
     updateCommentToggleBtn();
     updateMainBtn(true);
 
@@ -374,8 +374,8 @@
     playerEl  = commentEl  = overlayEl  = null;
     playerSaved = commentSaved = overlaySaved = null;
 
-    document.getElementById("nico-theater-ctoggle")?.remove();
-    document.body.classList.remove("nico-theater-on");
+    document.getElementById("nico-cinema-ctoggle")?.remove();
+    document.body.classList.remove("nico-cinema-on");
     updateMainBtn(false);
 
     setTimeout(() => window.dispatchEvent(new Event("resize")), 200);
@@ -385,7 +385,7 @@
 
   function addToggleBtn(hasComment) {
     const btn = document.createElement("button");
-    btn.id = "nico-theater-ctoggle";
+    btn.id = "nico-cinema-ctoggle";
     btn.innerHTML = `<span class="nct-arrow">◀</span><span class="nct-label">コメント</span>`;
     if (!hasComment) btn.style.display = "none";
     btn.style.right = `${COMMENT_W}px`;
@@ -406,14 +406,14 @@
         commentEl.style.setProperty("display", "none", "important");
       }
     }
-    const ctoggle = document.getElementById("nico-theater-ctoggle");
+    const ctoggle = document.getElementById("nico-cinema-ctoggle");
     if (ctoggle) ctoggle.style.right = rightVal;
     updateCommentToggleBtn();
     setTimeout(() => window.dispatchEvent(new Event("resize")), 50);
   }
 
   function updateCommentToggleBtn() {
-    const btn = document.getElementById("nico-theater-ctoggle");
+    const btn = document.getElementById("nico-cinema-ctoggle");
     if (!btn) return;
     const arrow = btn.querySelector(".nct-arrow");
     if (commentVisible) {
@@ -430,32 +430,32 @@
   // ─── メインボタン ────────────────────────────────────────────
 
   function createMainBtn() {
-    if (document.getElementById("nico-theater-btn")) return;
+    if (document.getElementById("nico-cinema-btn")) return;
     const btn = document.createElement("button");
-    btn.id = "nico-theater-btn";
-    btn.title = "シアターモード (T)";
+    btn.id = "nico-cinema-btn";
+    btn.title = "シネマモード (T)";
     btn.innerHTML = `
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
            stroke-linecap="round" stroke-linejoin="round">
         <rect x="2" y="3" width="20" height="14" rx="2"/>
         <path d="M8 21h8"/><path d="M12 17v4"/>
       </svg>`;
-    btn.addEventListener("click", toggleTheater);
+    btn.addEventListener("click", toggleCinema);
     document.body.appendChild(btn);
   }
 
   function updateMainBtn(on) {
-    const btn = document.getElementById("nico-theater-btn");
+    const btn = document.getElementById("nico-cinema-btn");
     if (!btn) return;
     btn.classList.toggle("active", on);
-    btn.title = on ? "シアターモード終了 (T)" : "シアターモード (T)";
+    btn.title = on ? "シネマモード終了 (T)" : "シネマモード (T)";
   }
 
-  function toggleTheater() {
+  function toggleCinema() {
     active = !active;
     if (active) { if (!enter()) active = false; }
     else exit();
-    chrome.runtime.sendMessage({ action: "theaterBadge", on: active });
+    chrome.runtime.sendMessage({ action: "cinemaBadge", on: active });
   }
 
   // ─── 初期化 ──────────────────────────────────────────────────
@@ -473,7 +473,7 @@
     document.addEventListener("keydown", (e) => {
       const tag = document.activeElement?.tagName?.toLowerCase();
       if (tag === "input" || tag === "textarea") return;
-      if (e.key === "t" && !e.ctrlKey && !e.altKey && !e.metaKey) toggleTheater();
+      if (e.key === "t" && !e.ctrlKey && !e.altKey && !e.metaKey) toggleCinema();
       if (e.key === "c" && !e.ctrlKey && !e.altKey && !e.metaKey && active) toggleComment();
     });
   }
@@ -485,6 +485,6 @@
   }
 
   chrome.runtime.onMessage.addListener((msg) => {
-    if (msg.action === "toggle") toggleTheater();
+    if (msg.action === "toggle") toggleCinema();
   });
 })();

@@ -1,14 +1,14 @@
 /* ═══════════════════════════════════════════════════════════
-   Nico Channel+ Theater Mode
+   Nico Channel+ Cinema Mode
    ═══════════════════════════════════════════════════════════ */
 
 /* ─── body ─────────────────────────────────────────────────── */
-body.nico-theater-on {
+body.nico-cinema-on {
   overflow: hidden !important;
 }
 
 /* ─── コメント開閉タブボタン ────────────────────────────────── */
-#nico-theater-ctoggle {
+#nico-cinema-ctoggle {
   position: fixed !important;
   top: 20px !important;
   transform: none !important;
@@ -37,13 +37,13 @@ body.nico-theater-on {
   transition: background 0.15s, color 0.15s, right 0.2s ease, opacity 0.2s !important;
 }
 
-#nico-theater-ctoggle:hover {
+#nico-cinema-ctoggle:hover {
   background: rgba(55, 55, 55, 0.98) !important;
   color: #fff !important;
   opacity: 0.55 !important;
 }
 
-#nico-theater-ctoggle.closed {
+#nico-cinema-ctoggle.closed {
   right: 0 !important;
   background: rgba(0, 100, 210, 0.92) !important;
   border-color: rgba(80, 150, 255, 0.3) !important;
@@ -51,7 +51,7 @@ body.nico-theater-on {
   opacity: 0.12 !important;
 }
 
-#nico-theater-ctoggle.closed:hover {
+#nico-cinema-ctoggle.closed:hover {
   opacity: 0.6 !important;
 }
 
@@ -75,7 +75,7 @@ body.nico-theater-on {
 }
 
 /* ─── メイントグルボタン（左下固定）────────────────────────── */
-#nico-theater-btn {
+#nico-cinema-btn {
   position: fixed !important;
   bottom: 20px !important;
   left: 20px !important;
@@ -103,25 +103,25 @@ body.nico-theater-on {
   line-height: 0 !important;
 }
 
-#nico-theater-btn svg {
+#nico-cinema-btn svg {
   width: 22px !important;
   height: 22px !important;
   display: block !important;
 }
 
-#nico-theater-btn:hover {
+#nico-cinema-btn:hover {
   background: rgba(55, 55, 55, 0.95) !important;
   color: #fff !important;
   opacity: 0.55 !important;
 }
 
-#nico-theater-btn.active {
+#nico-cinema-btn.active {
   background: rgba(0, 108, 218, 0.92) !important;
   border-color: rgba(100, 170, 255, 0.45) !important;
   color: #fff !important;
   opacity: 0.12 !important;
 }
 
-#nico-theater-btn.active:hover {
+#nico-cinema-btn.active:hover {
   opacity: 0.6 !important;
 }
