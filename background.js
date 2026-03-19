@@ -30,6 +30,15 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   if (changeInfo.url !== undefined) updateBadge(tabId, changeInfo.url);
 });
 
+chrome.runtime.onMessage.addListener((msg, sender) => {
+  if (msg.action === "theaterBadge" && sender.tab) {
+    const text  = msg.on ? "ON" : "OFF";
+    const color = msg.on ? "#006cda" : "#555";
+    chrome.action.setBadgeText({ text, tabId: sender.tab.id });
+    chrome.action.setBadgeBackgroundColor({ color, tabId: sender.tab.id });
+  }
+});
+
 chrome.action.onClicked.addListener((tab) => {
   chrome.tabs.sendMessage(tab.id, { action: "toggle" }).catch(() => {});
 });

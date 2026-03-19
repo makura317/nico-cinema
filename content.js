@@ -335,6 +335,7 @@
     active = !active;
     if (active) { if (!enter()) active = false; }
     else exit();
+    chrome.runtime.sendMessage({ action: "theaterBadge", on: active });
   }
 
   // ─── 初期化 ──────────────────────────────────────────────────
