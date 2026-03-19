@@ -186,7 +186,11 @@
     const pSlot = document.createElement("div");
     pSlot.id = "nico-theater-pslot";
 
-    theaterEl.append(pSlot);
+    const cSlot = document.createElement("div");
+    cSlot.id = "nico-theater-cslot";
+    if (!commentEl) cSlot.style.display = "none";
+
+    theaterEl.append(pSlot, cSlot);
     document.body.appendChild(theaterEl);
     addToggleBtn(!!commentEl);
 
@@ -211,7 +215,7 @@
       overlayEl.style.setProperty("z-index",        "5",        "important");
     }
 
-    // ── コメント: DOM移動せず fixed 配置（React イベント保持）──
+    // ── コメント: cSlotはスペーサーとして残し、commentEl はDOMそのままfixed配置 ──
     if (commentEl) {
       commentSaved = commentEl.style.cssText;
       commentEl.style.setProperty("position",   "fixed",          "important");
@@ -220,7 +224,6 @@
       commentEl.style.setProperty("width",      `${COMMENT_W}px`, "important");
       commentEl.style.setProperty("height",     "100%",           "important");
       commentEl.style.setProperty("max-height", "none",           "important");
-      commentEl.style.setProperty("overflow-y", "auto",           "important");
       commentEl.style.setProperty("z-index",    "2147483647",     "important");
     }
 
@@ -285,10 +288,13 @@
   function toggleComment() {
     if (!theaterEl) return;
     commentVisible = !commentVisible;
+    // cSlot（スペーサー）の表示切替
+    const cSlot = theaterEl.querySelector("#nico-theater-cslot");
+    if (cSlot) cSlot.style.display = commentVisible ? "" : "none";
+    // commentEl 本体の表示切替
     if (commentEl) {
       if (commentVisible) {
         commentEl.style.removeProperty("display");
-        commentEl.style.setProperty("right", "0", "important");
       } else {
         commentEl.style.setProperty("display", "none", "important");
       }
