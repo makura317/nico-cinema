@@ -243,7 +243,7 @@
     playerEl.style.setProperty("left",       "0",      "important");
     playerEl.style.setProperty("width",      playerW,  "important");
     playerEl.style.setProperty("height",     "100vh",  "important");
-    playerEl.style.setProperty("z-index",    "9995",   "important");
+    playerEl.style.setProperty("z-index",    "9998",   "important");
     playerEl.style.setProperty("margin",     "0",      "important");
     playerEl.style.setProperty("max-width",  "none",   "important");
     playerEl.style.setProperty("max-height", "none",   "important");
@@ -260,7 +260,7 @@
       overlayEl.style.setProperty("width",          playerW,  "important");
       overlayEl.style.setProperty("height",         "100vh",  "important");
       overlayEl.style.setProperty("pointer-events", "none",   "important");
-      overlayEl.style.setProperty("z-index",        "9996",   "important");
+      overlayEl.style.setProperty("z-index",        "9997",   "important");
     }
 
     // ── コメント: cSlotはスペーサーとして残し、commentEl はDOMそのままfixed配置 ──
