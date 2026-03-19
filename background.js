@@ -14,13 +14,6 @@ function updateBadge(tabId, url) {
   if (match) chrome.action.setBadgeBackgroundColor({ color: BADGE_COLOR, tabId });
 }
 
-chrome.tabs.onActivated.addListener(({ tabId }) => {
-  chrome.tabs.get(tabId, (tab) => {
-    if (chrome.runtime.lastError) return;
-    updateBadge(tabId, tab.url);
-  });
-});
-
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   if (changeInfo.url !== undefined) updateBadge(tabId, changeInfo.url);
 });
