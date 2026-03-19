@@ -144,8 +144,8 @@ body.nico-theater-on {
 /* ─── メイントグルボタン（右下固定）────────────────────────── */
 #nico-theater-btn {
   position: fixed !important;
-  bottom: 20px !important;
-  right: 20px !important;
+  top: 12px !important;
+  right: 12px !important;
   z-index: 10001 !important;
 
   width: 44px !important;
