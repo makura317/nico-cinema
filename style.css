@@ -13,11 +13,11 @@ body.nico-theater-on {
 
   position: fixed !important;
   inset: 0 !important;
-  z-index: 2147483647 !important;
+  z-index: 9998 !important;
   display: flex !important;
   flex-direction: row !important;
   gap: 0 !important;
-  background: #000 !important;
+  background: transparent !important;
   overflow: hidden !important;
   margin: 0 !important;
   padding: 0 !important;
@@ -53,16 +53,17 @@ body.nico-theater-on {
   display: block !important;
 }
 
-/* ─── コメントスロット ──────────────────────────────────────── */
+/* ─── コメントスロット（スペーサーのみ・背景透過） ──────────── */
 #nico-theater-cslot {
   width: var(--cw) !important;
   flex-shrink: 0 !important;
   height: 100% !important;
-  background: #111 !important;
+  background: transparent !important;
   overflow: hidden !important;
   display: flex !important;
   flex-direction: column !important;
   transition: width 0.2s ease !important;
+  pointer-events: none !important;
 }
 
 #nico-theater-cslot > * {
@@ -75,11 +76,10 @@ body.nico-theater-on {
 
 /* ─── コメント開閉タブボタン ────────────────────────────────── */
 #nico-theater-ctoggle {
-  position: absolute !important;
-  right: var(--cw) !important;
+  position: fixed !important;
   top: 20px !important;
   transform: none !important;
-  z-index: 10 !important;
+  z-index: 10000 !important;
 
   width: 24px !important;
   height: 88px !important;
@@ -146,7 +146,7 @@ body.nico-theater-on {
   position: fixed !important;
   bottom: 20px !important;
   right: 20px !important;
-  z-index: 2147483646 !important;
+  z-index: 10001 !important;
 
   width: 44px !important;
   height: 44px !important;

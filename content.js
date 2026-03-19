@@ -224,7 +224,7 @@
       commentEl.style.setProperty("width",      `${COMMENT_W}px`, "important");
       commentEl.style.setProperty("height",     "100%",           "important");
       commentEl.style.setProperty("max-height", "none",           "important");
-      commentEl.style.setProperty("z-index",    "2147483647",     "important");
+      commentEl.style.setProperty("z-index",    "9999",           "important");
     }
 
     commentVisible = true;
@@ -281,8 +281,9 @@
     btn.id = "nico-theater-ctoggle";
     btn.innerHTML = `<span class="nct-arrow">◀</span><span class="nct-label">コメント</span>`;
     if (!hasComment) btn.style.display = "none";
+    btn.style.right = `${COMMENT_W}px`;
     btn.addEventListener("click", toggleComment);
-    theaterEl.appendChild(btn);
+    document.body.appendChild(btn);
   }
 
   function toggleComment() {
@@ -300,6 +301,8 @@
       }
     }
     theaterEl.style.setProperty("--cw", commentVisible ? `${COMMENT_W}px` : "0px");
+    const ctoggle = document.getElementById("nico-theater-ctoggle");
+    if (ctoggle) ctoggle.style.right = commentVisible ? `${COMMENT_W}px` : "0px";
     updateCommentToggleBtn();
     setTimeout(() => window.dispatchEvent(new Event("resize")), 50);
   }
