@@ -19,7 +19,8 @@
   "content_scripts": [
     {
       "matches": [
-        "*://nicochannel.jp/*"
+        "*://nicochannel.jp/*",
+        "*://audee-membership.jp/*"
       ],
       "js": ["content.js"],
       "css": ["style.css"],

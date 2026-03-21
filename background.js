@@ -2,7 +2,9 @@ function isTargetUrl(url) {
   if (!url) return false;
   try {
     const u = new URL(url);
-    return u.hostname === "nicochannel.jp" && /\/(video|live)\//.test(u.pathname);
+    if (u.hostname === "nicochannel.jp") return /\/(video|live)\//.test(u.pathname);
+    if (u.hostname === "audee-membership.jp") return true;
+    return false;
   } catch (_) { return false; }
 }
 
