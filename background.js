@@ -3,7 +3,7 @@ function isTargetUrl(url) {
   try {
     const u = new URL(url);
     if (u.hostname === "nicochannel.jp") return /\/(video|live)\//.test(u.pathname);
-    if (u.hostname === "audee-membership.jp") return true;
+    if (["audee-membership.jp", "sheeta.jp", "qlover.jp"].includes(u.hostname)) return true;
     return false;
   } catch (_) { return false; }
 }
